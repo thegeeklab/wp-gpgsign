@@ -89,6 +89,14 @@ func (p *Plugin) Execute() error {
 		log.Info().Msg("no files found: running in setup-only mode")
 	}
 
+	if p.Settings.Homedir != "" {
+		log.Debug().Msg("overwrite default homedir with plugin setting")
+
+		if err := gpgclient.SetHomedir(p.Settings.Homedir); err != nil {
+			return err
+		}
+	}
+
 	// Get gpg info
 	version, err := gpgclient.GetVersion()
 	if err != nil {

@@ -65,19 +65,36 @@ func New(key, passphrase string) (*Client, error) {
 		Version: Version{},
 	}
 
-	tmpDir, err := os.MkdirTemp("/tmp", "plugin_gpgsign_")
-	if err != nil {
-		return client, fmt.Errorf("failed to create tmp dir: %w", err)
-	}
-
-	if err := os.Chmod(tmpDir, strictDirPerm); err != nil {
+	if err := client.SetHomedir(""); err != nil {
 		return client, err
 	}
 
-	client.Homedir = tmpDir
-	client.Env = append(client.Env, fmt.Sprintf("GNUPGHOME=%s", client.Homedir))
-
 	return client, nil
+}
+
+func (c *Client) SetHomedir(path string) error {
+	var err error
+
+	if path == "" {
+		path, err = os.MkdirTemp("/tmp", "plugin_gpgsign_")
+		if err != nil {
+			return fmt.Errorf("failed to create tmp dir: %w", err)
+		}
+
+		if err := os.Chmod(path, strictDirPerm); err != nil {
+			return err
+		}
+	} else {
+		err = os.MkdirAll(path, strictDirPerm)
+		if err != nil {
+			return fmt.Errorf("failed to create homedir dir: %w", err)
+		}
+	}
+
+	c.Homedir = path
+	c.Env = append(c.Env, fmt.Sprintf("GNUPGHOME=%s", c.Homedir))
+
+	return nil
 }
 
 // GetDirs queries gpgconf to get the GnuPG directory paths

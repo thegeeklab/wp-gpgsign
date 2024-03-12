@@ -16,6 +16,13 @@ import (
 func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
+			Name:        "homedir",
+			Usage:       "gpg home directory",
+			EnvVars:     []string{"PLUGIN_HOMEDIR", "GNUPGHOME"},
+			Destination: &settings.Homedir,
+			Category:    category,
+		},
+		&cli.StringFlag{
 			Name:     "key",
 			Usage:    "armored private gpg private key or the base64 encoded string of it",
 			EnvVars:  []string{"PLUGIN_KEY", "GPGSIGN_KEY", "GPG_KEY"},
