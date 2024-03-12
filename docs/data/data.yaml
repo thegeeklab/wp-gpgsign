@@ -1,0 +1,40 @@
+---
+properties:
+  - name: clear_sign
+    description: |
+      Wrap the file in an ASCII-armored signature.
+    type: bool
+    defaultValue: false
+    required: false
+
+  - name: detach_sign
+    description: |
+      Creates a detached signature for the file.
+    type: bool
+    defaultValue: false
+    required: false
+
+  - name: excludes
+    description: |
+      List of glob patterns to determine files to be excluded from signing.
+    type: list
+    required: false
+
+  - name: files
+    description: |
+      List of glob patterns to determine files to be signed. If the list is empty, the plugin runs in
+      setup-only mode. This is useful if the gpg key is required for other steps in the workflow.
+    type: list
+    required: false
+
+  - name: key
+    description: |
+      Armored private gpg private key or the base64 encoded string of it.
+    type: string
+    required: true
+
+  - name: passphrase
+    description: |
+      Passphrase for the gpg private key.
+    type: string
+    required: false
