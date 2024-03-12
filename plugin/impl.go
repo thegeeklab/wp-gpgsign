@@ -92,7 +92,9 @@ func (p *Plugin) Execute() error {
 	if p.Settings.Homedir != "" {
 		log.Debug().Msg("overwrite default homedir with plugin setting")
 
-		gpgclient.Homedir = p.Settings.Homedir
+		if err := gpgclient.SetHomedir(p.Settings.Homedir); err != nil {
+			return err
+		}
 	}
 
 	// Get gpg info
