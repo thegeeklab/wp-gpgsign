@@ -23,18 +23,24 @@ properties:
   - name: files
     description: |
       List of glob patterns to determine files to be signed. If the list is empty, the plugin runs in
-      setup-only mode. This is useful if the gpg key is required for other steps in the workflow.
+      setup-only mode. This is useful if the GPG key is required for other steps in the workflow.
     type: list
+    required: false
+
+  - name: homedir
+    description: |
+      GPG home directory. By default, a random home directory is generated in `/tmp`.
+    type: string
     required: false
 
   - name: key
     description: |
-      Armored private gpg private key or the base64 encoded string of it.
+      Armored private GPG private key or the base64 encoded string of it.
     type: string
     required: true
 
   - name: passphrase
     description: |
-      Passphrase for the gpg private key.
+      Passphrase for the GPG private key.
     type: string
     required: false

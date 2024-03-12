@@ -17,6 +17,7 @@ type Plugin struct {
 
 // Settings for the plugin.
 type Settings struct {
+	Homedir    string
 	Key        string
 	Passphrase string
 	DetachSign bool
