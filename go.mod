@@ -1,6 +1,6 @@
 module github.com/thegeeklab/wp-gpgsign
 
-go 1.22.0
+go 1.22
 
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.5
