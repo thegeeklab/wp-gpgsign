@@ -26,7 +26,7 @@ steps:
     image: quay.io/thegeeklab/wp-gpgsign
     settings:
       key: LS0tLS1CRUdJTi...tLS0tCg==
-      passphrase: random-string
+      passphrase: randomstring
       files:
         - dist/*
 ```
@@ -58,6 +58,7 @@ docker build --file Containerfile.multiarch --tag thegeeklab/wp-gpgsign .
 ```Shell
 docker run --rm \
   -e PLUGIN_KEY=LS0tLS1CRUdJTi...tLS0tCg== \
+  -e PLUGIN_PASSPHRASE=randomstring \
   -v $(pwd):/build:z \
   -w /build \
   thegeeklab/wp-gpgsign
