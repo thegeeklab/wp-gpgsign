@@ -36,7 +36,7 @@ func (c *Client) ReadPrivateKey() error {
 	primary := entity.PrimaryKey
 
 	c.Key.ID = primary.KeyIdString()
-	c.Key.CreationTime = primary.CreationTime
+	c.Key.CreationTime = primary.CreationTime.UTC()
 	c.Key.Identity = entity.PrimaryIdentity().Name
 	c.Key.Fingerprint = strings.ToUpper(hex.EncodeToString(primary.Fingerprint))
 

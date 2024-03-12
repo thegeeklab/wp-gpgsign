@@ -1,7 +1,6 @@
 package gnupg
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -129,7 +128,6 @@ func TestReadPrivateKey(t *testing.T) {
 
 	for _, tt := range tests {
 		gpgclient, _ := New(tt.key, "")
-		fmt.Println(gpgclient.Key.Content)
 
 		t.Run(tt.name, func(t *testing.T) {
 			err := gpgclient.ReadPrivateKey()
@@ -145,7 +143,7 @@ func TestReadPrivateKey(t *testing.T) {
 			assert.Equal(t, gpgclient.Key.ID, testKeyID)
 			assert.Equal(t, gpgclient.Key.Fingerprint, testKeyFingerprint)
 			assert.Equal(t, gpgclient.Key.Identity, testKeyIdentity)
-			assert.Equal(t, gpgclient.Key.CreationTime, testKeyCreation)
+			assert.Equal(t, gpgclient.Key.CreationTime, testKeyCreation.UTC())
 		})
 	}
 }
