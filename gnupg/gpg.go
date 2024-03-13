@@ -1,24 +1,33 @@
 package gnupg
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/thegeeklab/wp-plugin-go/trace"
 	"golang.org/x/sys/execabs"
 )
 
-var ErrGPGDirLookupFailed = errors.New("failed to lookup GPG directories")
+var (
+	ErrDirLookupFailed    = errors.New("failed to lookup gpg directories")
+	ErrInvalidTrustLevel  = errors.New("invlaid key owner trust level")
+	ErrAgentSetupFailed   = errors.New("gpg agent setup failed")
+	ErrAgentCommandFailed = errors.New("gpg agent command failed")
+	ErrGetKeygripsFailed  = errors.New("failed to get keygrips")
+)
 
 const (
-	gpgBin     = "/usr/bin/gpg"
-	gpgconfBin = "/usr/bin/gpgconf"
+	gpgBin             = "/usr/bin/gpg"
+	gpgconfBin         = "/usr/bin/gpgconf"
+	gpgAgentBin        = "/usr/bin/gpg-agent"
+	gpgConnectAgentBin = "/usr/bin/gpg-connect-agent"
 
-	strictDirPerm = 0o700
+	strictDirPerm  = 0o700
+	strictFilePerm = 0o600
 )
 
 type Client struct {
@@ -51,10 +60,7 @@ type Dirs struct {
 	Home    string
 }
 
-// New creates a new GPG client instance with the provided key and passphrase.
-// It initializes the client fields and creates a temporary home directory for
-// GPG operations. The home directory permissions are set to 0700 and the
-// GNUPGHOME environment variable is set to point to the home directory.
+// New creates a new Client instance with the given private key and passphrase.
 func New(key, passphrase string) (*Client, error) {
 	client := &Client{
 		Key: Key{
@@ -65,30 +71,28 @@ func New(key, passphrase string) (*Client, error) {
 		Version: Version{},
 	}
 
-	if err := client.SetHomedir(""); err != nil {
+	home := "/root"
+
+	if currentUser, err := user.Current(); err == nil {
+		home = currentUser.HomeDir
+	}
+
+	home = filepath.Join(home, ".gnupg")
+
+	if err := client.SetHomedir(home); err != nil {
 		return client, err
 	}
 
 	return client, nil
 }
 
+// SetHomedir sets the home directory path for the GPG client.
+// It creates the directory if it doesn't exist and sets the
+// GNUPGHOME environment variable to point to it.
 func (c *Client) SetHomedir(path string) error {
-	var err error
-
-	if path == "" {
-		path, err = os.MkdirTemp("/tmp", "plugin_gpgsign_")
-		if err != nil {
-			return fmt.Errorf("failed to create tmp dir: %w", err)
-		}
-
-		if err := os.Chmod(path, strictDirPerm); err != nil {
-			return err
-		}
-	} else {
-		err = os.MkdirAll(path, strictDirPerm)
-		if err != nil {
-			return fmt.Errorf("failed to create homedir dir: %w", err)
-		}
+	err := os.MkdirAll(path, strictDirPerm)
+	if err != nil {
+		return fmt.Errorf("failed to create homedir dir: %w", err)
 	}
 
 	c.Homedir = path
@@ -106,14 +110,14 @@ func (c *Client) GetDirs() error {
 
 	cmd.Env = append(os.Environ(), c.Env...)
 
-	output, err := cmd.Output()
+	out, err := cmd.Output()
 	if err != nil {
 		return err
 	}
 
-	res := string(output)
+	res := string(out)
 	if len(res) > 0 && cmd.ProcessState.ExitCode() != 0 {
-		return fmt.Errorf("%w: %s", ErrGPGDirLookupFailed, res)
+		return fmt.Errorf("%w: %s", ErrDirLookupFailed, res)
 	}
 
 	lines := strings.Split(strings.ReplaceAll(res, "\r", ""), "\n")
@@ -154,12 +158,12 @@ func (c *Client) GetVersion() (*Version, error) {
 
 	cmd.Env = append(os.Environ(), c.Env...)
 
-	output, err := cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return version, err
 	}
 
-	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 	for _, line := range lines {
 		switch {
 		case strings.HasPrefix(line, "gpg (GnuPG) "):
@@ -172,115 +176,6 @@ func (c *Client) GetVersion() (*Version, error) {
 	}
 
 	return version, nil
-}
-
-// ImportKey imports a GPG key provided via the Key.Content field.
-// It runs the gpg --import command to import the key into the keyring.
-// Returns an error if the import command fails.
-func (c *Client) ImportKey() error {
-	args := []string{
-		"--batch",
-		"--import",
-		"-",
-	}
-
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
-
-	cmd.Env = append(os.Environ(), c.Env...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = strings.NewReader(c.Key.Content)
-
-	trace.Cmd(cmd)
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to import gpg key: %w", err)
-	}
-
-	return nil
-}
-
-// SetTrustLevel sets the trust level for the public key in the client.
-// It runs the gpg --edit-key command to set the trust level to the
-// provided level string. Valid levels are "undefined", "never",
-// "marginal", "full", "ultimate". Returns an error if the command fails.
-func (c *Client) SetTrustLevel(level string) error {
-	args := []string{
-		"--batch",
-		"--no-tty",
-		"--command-fd",
-		"0",
-		"--edit-key",
-		c.Key.ID,
-	}
-
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
-
-	cmd.Env = append(os.Environ(), c.Env...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = bytes.NewBuffer([]byte(fmt.Sprintf("trust\n%s\ny\nquit\n", level)))
-
-	trace.Cmd(cmd)
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to set trustlevel: %w", err)
-	}
-
-	return nil
-}
-
-// SignFile signs the file at the given path with the configured key.
-// It supports detached, cleartext, and normal signing based on the
-// detach and clear arguments.
-func (c *Client) SignFile(detach, clear bool, path string) error {
-	args := []string{
-		"--batch",
-		"--yes",
-		"--armor",
-	}
-
-	if c.Key.Passphrase != "" {
-		args = append(args, "--pinentry-mode", "loopback", "--passphrase-fd", "0")
-	}
-
-	switch {
-	case detach:
-		args = append(args, "--detach-sign")
-	case clear:
-		args = append(args, "--clear-sign")
-	default:
-		args = append(args, "--sign")
-	}
-
-	args = append(args, path)
-
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
-
-	cmd.Env = append(os.Environ(), c.Env...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if c.Key.Passphrase != "" {
-		cmd.Stdin = strings.NewReader(c.Key.Passphrase)
-	}
-
-	trace.Cmd(cmd)
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to sign file: %w", err)
-	}
-
-	return nil
 }
 
 // Cleanup removes the home directory for the given key, if one was specified.
