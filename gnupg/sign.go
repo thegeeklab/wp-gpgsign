@@ -3,18 +3,25 @@ package gnupg
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/thegeeklab/wp-plugin-go/trace"
 	"golang.org/x/sys/execabs"
 )
 
-// SignFile signs the file at the given path. It supports detached, cleartext, and normal signing.
+// SignFile signs the file at the given path with the configured key.
+// It supports detached, cleartext, and normal signing based on the
+// detach and clear arguments.
 func (c *Client) SignFile(detach, clear bool, path string) error {
 	args := []string{
 		"--batch",
 		"--no-tty",
 		"--yes",
 		"--armor",
+	}
+
+	if c.Key.Passphrase != "" {
+		args = append(args, "--pinentry-mode", "loopback", "--passphrase-fd", "0")
 	}
 
 	switch {
@@ -35,6 +42,10 @@ func (c *Client) SignFile(detach, clear bool, path string) error {
 
 	cmd.Env = append(os.Environ(), c.Env...)
 	cmd.Stderr = os.Stderr
+
+	if c.Key.Passphrase != "" {
+		cmd.Stdin = strings.NewReader(c.Key.Passphrase)
+	}
 
 	trace.Cmd(cmd)
 

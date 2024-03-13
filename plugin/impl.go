@@ -158,33 +158,9 @@ func (p *Plugin) Execute() error {
 		return err
 	}
 
-	// Exit early as starting gpg-agent in setup-only mode is useless
+	// Exit early in setup-only mode
 	if p.Settings.setupOnly {
 		return nil
-	}
-
-	// Prepare keygrips and gpg-agent
-	log.Info().Msg("start gpg-agent")
-
-	if err := gpgclient.StartAgent(); err != nil {
-		return err
-	}
-
-	fingerprintOnly := (p.Settings.Fingerprint != "")
-
-	log.Info().Msg("get keygrips")
-
-	keygrips, err := gpgclient.GetKeygrips(fingerprintOnly)
-	if err != nil {
-		return err
-	}
-
-	for _, keygrip := range keygrips {
-		log.Info().Msgf("preset passphrase for %s", keygrip)
-
-		if err := gpgclient.PresetPassphrase(keygrip); err != nil {
-			return err
-		}
 	}
 
 	// Sign all given files

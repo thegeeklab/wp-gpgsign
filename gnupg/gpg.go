@@ -13,18 +13,14 @@ import (
 )
 
 var (
-	ErrDirLookupFailed    = errors.New("failed to lookup gpg directories")
-	ErrInvalidTrustLevel  = errors.New("invlaid key owner trust level")
-	ErrAgentSetupFailed   = errors.New("gpg agent setup failed")
-	ErrAgentCommandFailed = errors.New("gpg agent command failed")
-	ErrGetKeygripsFailed  = errors.New("failed to get keygrips")
+	ErrDirLookupFailed   = errors.New("failed to lookup gpg directories")
+	ErrInvalidTrustLevel = errors.New("invlaid key owner trust level")
+	ErrGetKeygripsFailed = errors.New("failed to get keygrips")
 )
 
 const (
-	gpgBin             = "/usr/bin/gpg"
-	gpgconfBin         = "/usr/bin/gpgconf"
-	gpgAgentBin        = "/usr/bin/gpg-agent"
-	gpgConnectAgentBin = "/usr/bin/gpg-connect-agent"
+	gpgBin     = "/usr/bin/gpg"
+	gpgconfBin = "/usr/bin/gpgconf"
 
 	strictDirPerm  = 0o700
 	strictFilePerm = 0o600
