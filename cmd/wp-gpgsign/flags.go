@@ -36,6 +36,28 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Destination: &settings.Passphrase,
 			Category:    category,
 		},
+		&cli.StringFlag{
+			Name:        "fingerprint",
+			Usage:       "specific fingerprint to be used (subkey)",
+			EnvVars:     []string{"PLUGIN_FINGERPRINT", "GPGSIGN_FINGERPRINT", "GPG_FINGERPRINT"},
+			Destination: &settings.Fingerprint,
+			Category:    category,
+		},
+		&cli.StringFlag{
+			Name:        "trust-level",
+			Usage:       "key owner trust level",
+			EnvVars:     []string{"PLUGIN_TRUST_LEVEL"},
+			Destination: &settings.TrustLevel,
+			Value:       "unknown",
+			Category:    category,
+		},
+		&cli.BoolFlag{
+			Name:        "armor",
+			Usage:       "create ASCII-armored output instead of a binary",
+			Destination: &settings.Armor,
+			Value:       false,
+			EnvVars:     []string{"PLUGIN_ARMOR"},
+		},
 		&cli.BoolFlag{
 			Name:        "detach-sign",
 			Usage:       "creates a detached signature for the file",

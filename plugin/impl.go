@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"os"
 
 	"github.com/rs/zerolog/log"
 	"github.com/thegeeklab/wp-gpgsign/gnupg"
@@ -39,14 +40,16 @@ func (p *Plugin) FlagsFromContext() error {
 
 	rawFiles := slice.Unique(p.Context.StringSlice("files"))
 
-	p.Settings.files, err = file.ExpandFileList(rawFiles)
+	p.Settings.files, err = expandGlobList(rawFiles)
 	if err != nil {
 		return fmt.Errorf("failed to parse files: %w", err)
 	}
 
+	p.Settings.setupOnly = (len(p.Settings.files) < 1)
+
 	rawExcludes := slice.Unique(p.Context.StringSlice("excludes"))
 
-	p.Settings.excludes, err = file.ExpandFileList(rawExcludes)
+	p.Settings.excludes, err = expandGlobList(rawExcludes)
 	if err != nil {
 		return fmt.Errorf("failed to parse excludes: %w", err)
 	}
@@ -85,7 +88,7 @@ func (p *Plugin) Execute() error {
 		_ = gpgclient.Cleanup()
 	}()
 
-	if len(p.Settings.files) < 1 {
+	if p.Settings.setupOnly {
 		log.Info().Msg("no files found: running in setup-only mode")
 	}
 
@@ -108,8 +111,10 @@ func (p *Plugin) Execute() error {
 		return err
 	}
 
+	log.Info().Msgf("read private key and environment metadata")
+
 	fmt.Print(
-		"\nGnuPG info\n",
+		"GnuPG info\n",
 		fmt.Sprintf("Version    : %s (libgcrypt %s)\n", version.Gnupg, version.Libgcrypt),
 		fmt.Sprintf("Libdir     : %s\n", gpgclient.Dirs.Lib),
 		fmt.Sprintf("Libexecdir : %s\n", gpgclient.Dirs.Libexec),
@@ -129,25 +134,65 @@ func (p *Plugin) Execute() error {
 		fmt.Sprintf("KeyID        : %s\n", gpgclient.Key.ID),
 		fmt.Sprintf("Identity     : %s\n", gpgclient.Key.Identity),
 		fmt.Sprintf("CreationTime : %s\n", gpgclient.Key.CreationTime),
-		"\n",
 	)
 
+	if p.Settings.Fingerprint != "" {
+		gpgclient.Key.Fingerprint = p.Settings.Fingerprint
+	}
+
+	log.Info().Str("fingerprint", gpgclient.Key.Fingerprint).
+		Msg("use fingerprint")
+
 	// Import key
+	log.Info().Msg("import private key")
+
 	if err := gpgclient.ImportKey(); err != nil {
 		return err
 	}
 
-	// Set key trust level
+	// Set key owner trust
+	log.Info().Str("trustlevel", p.Settings.TrustLevel).
+		Msg("set key owner trust")
+
 	if err := gpgclient.SetTrustLevel(p.Settings.TrustLevel); err != nil {
 		return err
 	}
 
+	// Exit early in setup-only mode
+	if p.Settings.setupOnly {
+		return nil
+	}
+
 	// Sign all given files
-	for _, path := range slice.SetDifference(p.Settings.files, p.Settings.excludes, true) {
-		if err := gpgclient.SignFile(p.Settings.DetachSign, p.Settings.ClearSign, path); err != nil {
+	for i, path := range slice.SetDifference(p.Settings.files, p.Settings.excludes, true) {
+		if i == 0 {
+			log.Info().Msg("sign files")
+		}
+
+		if err := gpgclient.SignFile(p.Settings.Armor, p.Settings.DetachSign, p.Settings.ClearSign, path); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+// expandGlobList expands a list of file globs into a list of individual file paths.
+// It filters the results to only include regular files.
+func expandGlobList(fileList []string) ([]string, error) {
+	result := make([]string, 0)
+
+	files, err := file.ExpandFileList(fileList)
+	if err != nil {
+		return result, err
+	}
+
+	for _, f := range files {
+		fs, _ := os.Stat(f)
+		if fs.Mode().IsRegular() {
+			result = append(result, f)
+		}
+	}
+
+	return result, err
 }

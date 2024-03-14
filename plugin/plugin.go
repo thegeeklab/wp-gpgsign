@@ -17,15 +17,18 @@ type Plugin struct {
 
 // Settings for the plugin.
 type Settings struct {
-	Homedir    string
-	Key        string
-	Passphrase string
-	DetachSign bool
-	ClearSign  bool
-	TrustLevel string
+	Homedir     string
+	Key         string
+	Passphrase  string
+	Fingerprint string
+	Armor       bool
+	DetachSign  bool
+	ClearSign   bool
+	TrustLevel  string
 
-	files    []string
-	excludes []string
+	setupOnly bool
+	files     []string
+	excludes  []string
 }
 
 func New(options wp.Options, settings *Settings) *Plugin {
