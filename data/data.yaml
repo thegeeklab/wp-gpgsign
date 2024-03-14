@@ -1,5 +1,12 @@
 ---
 properties:
+  - name: armor
+    description: |
+      Create ASCII-armored output instead of a binary.
+    type: bool
+    defaultValue: false
+    required: false
+
   - name: clear_sign
     description: |
       Wrap the file in an ASCII-armored signature.
@@ -27,10 +34,18 @@ properties:
     type: list
     required: false
 
+  - name: fingerprint
+    description: |
+      Specific fingerprint to be used. Most like this option is required if a subkey of the given
+      GPG key should be used. If not set, the fingerprint of the primary key is used.
+    type: string
+    required: false
+
   - name: homedir
     description: |
-      GPG home directory. By default, a random home directory is generated in `/tmp`.
+      GPG home directory.
     type: string
+    defaultValue: $HOME/.gnupg
     required: false
 
   - name: key
@@ -43,4 +58,11 @@ properties:
     description: |
       Passphrase for the GPG private key.
     type: string
+    required: false
+
+  - name: trust_level
+    description: |
+      Key owner trust level. Supported values: `unknown|never|marginal|full|ultimate`.
+    type: string
+    defaultValue: "unknown"
     required: false
