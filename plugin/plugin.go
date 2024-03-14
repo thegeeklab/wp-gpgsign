@@ -21,6 +21,7 @@ type Settings struct {
 	Key         string
 	Passphrase  string
 	Fingerprint string
+	Armor       bool
 	DetachSign  bool
 	ClearSign   bool
 	TrustLevel  string

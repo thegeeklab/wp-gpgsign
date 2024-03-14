@@ -52,6 +52,13 @@ func settingsFlags(settings *plugin.Settings, category string) []cli.Flag {
 			Category:    category,
 		},
 		&cli.BoolFlag{
+			Name:        "armor",
+			Usage:       "create ASCII-armored output instead of a binary",
+			Destination: &settings.Armor,
+			Value:       false,
+			EnvVars:     []string{"PLUGIN_ARMOR"},
+		},
+		&cli.BoolFlag{
 			Name:        "detach-sign",
 			Usage:       "creates a detached signature for the file",
 			EnvVars:     []string{"PLUGIN_DETACH_SIGN"},

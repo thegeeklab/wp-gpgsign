@@ -169,7 +169,7 @@ func (p *Plugin) Execute() error {
 			log.Info().Msg("sign files")
 		}
 
-		if err := gpgclient.SignFile(p.Settings.DetachSign, p.Settings.ClearSign, path); err != nil {
+		if err := gpgclient.SignFile(p.Settings.Armor, p.Settings.DetachSign, p.Settings.ClearSign, path); err != nil {
 			return err
 		}
 	}
