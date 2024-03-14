@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"golang.org/x/sys/execabs"
 )
 
@@ -67,10 +67,11 @@ func New(key, passphrase string) (*Client, error) {
 		Version: Version{},
 	}
 
-	home := "/root"
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Warn().Msgf("failed to get user home dir: %s: fallback to '/root'", err)
 
-	if currentUser, err := user.Current(); err == nil {
-		home = currentUser.HomeDir
+		home = "/root"
 	}
 
 	home = filepath.Join(home, ".gnupg")
