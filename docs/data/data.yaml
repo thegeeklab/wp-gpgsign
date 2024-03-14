@@ -62,7 +62,7 @@ properties:
 
   - name: trust_level
     description: |
-      Key owner trust level. Supported values: `unknown|nevermarginal|full|ultimate`.
+      Key owner trust level. Supported values: `unknown|never|marginal|full|ultimate`.
     type: string
     defaultValue: "unknown"
     required: false
