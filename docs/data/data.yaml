@@ -1,5 +1,12 @@
 ---
 properties:
+  - name: armor
+    description: |
+      Create ASCII-armored output instead of a binary.
+    type: bool
+    defaultValue: false
+    required: false
+
   - name: clear_sign
     description: |
       Wrap the file in an ASCII-armored signature.
