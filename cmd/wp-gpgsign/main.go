@@ -10,7 +10,7 @@ import (
 
 	"github.com/thegeeklab/wp-gpgsign/plugin"
 
-	wp "github.com/thegeeklab/wp-plugin-go/plugin"
+	wp "github.com/thegeeklab/wp-plugin-go/v2/plugin"
 )
 
 //nolint:gochecknoglobals
