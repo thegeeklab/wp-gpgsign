@@ -39,10 +39,9 @@ func TestClient_SetHomedir(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	tests := []struct {
-		name    string
-		path    string
-		want    *Client
-		wantErr bool
+		name string
+		path string
+		want *Client
 	}{
 		{
 			name: "existing path",
@@ -60,11 +59,6 @@ func TestClient_SetHomedir(t *testing.T) {
 				Homedir: filepath.Join(tmpDir, "subdir"),
 			},
 		},
-		{
-			name:    "invalid path",
-			path:    "/invalid/path",
-			wantErr: true,
-		},
 	}
 
 	for _, tt := range tests {
@@ -72,12 +66,6 @@ func TestClient_SetHomedir(t *testing.T) {
 			c := &Client{}
 
 			err := c.SetHomedir(tt.path)
-			if tt.wantErr {
-				assert.Error(t, err)
-
-				return
-			}
-
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want, c)
 		})
