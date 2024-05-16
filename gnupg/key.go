@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
-	"github.com/thegeeklab/wp-plugin-go/trace"
+	"github.com/thegeeklab/wp-plugin-go/v2/types"
 	"golang.org/x/sys/execabs"
 )
 
@@ -62,17 +62,18 @@ func (c *Client) ImportKey() error {
 		"-",
 	}
 
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
+	bin, err := execabs.LookPath(c.gpgBin)
+	if err != nil {
+		return fmt.Errorf("failed to find gpg binary: %w", err)
+	}
+
+	cmd := types.Cmd{
+		Cmd:         execabs.Command(bin, args...),
+		TraceWriter: c.traceWriter,
+	}
 
 	cmd.Env = append(os.Environ(), c.Env...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
 	cmd.Stdin = strings.NewReader(c.Key.Content)
-
-	trace.Cmd(cmd)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to import gpg key: %w", err)
@@ -101,17 +102,18 @@ func (c *Client) SetTrustLevel(level string) error {
 		c.Key.ID,
 	}
 
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
+	bin, err := execabs.LookPath(c.gpgBin)
+	if err != nil {
+		return fmt.Errorf("failed to find gpg binary: %w", err)
+	}
+
+	cmd := types.Cmd{
+		Cmd:         execabs.Command(bin, args...),
+		TraceWriter: c.traceWriter,
+	}
 
 	cmd.Env = append(os.Environ(), c.Env...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
 	cmd.Stdin = bytes.NewBuffer([]byte(fmt.Sprintf("trust\n%s\ny\nquit\n", level)))
-
-	trace.Cmd(cmd)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to set key owner trust: %w", err)

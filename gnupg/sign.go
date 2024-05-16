@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/thegeeklab/wp-plugin-go/trace"
+	"github.com/thegeeklab/wp-plugin-go/v2/types"
 	"golang.org/x/sys/execabs"
 )
 
@@ -40,19 +40,22 @@ func (c *Client) SignFile(armor, detach, clear bool, path string) error {
 
 	args = append(args, path)
 
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
+	bin, err := execabs.LookPath(c.gpgBin)
+	if err != nil {
+		return fmt.Errorf("failed to find gpg binary: %w", err)
+	}
+
+	cmd := types.Cmd{
+		Cmd:         execabs.Command(bin, args...),
+		Private:     true,
+		TraceWriter: c.traceWriter,
+	}
 
 	cmd.Env = append(os.Environ(), c.Env...)
-	cmd.Stderr = os.Stderr
 
 	if c.Key.Passphrase != "" {
 		cmd.Stdin = strings.NewReader(c.Key.Passphrase)
 	}
-
-	trace.Cmd(cmd)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to sign file: %w", err)
