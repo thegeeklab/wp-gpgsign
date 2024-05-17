@@ -48,11 +48,25 @@ properties:
     defaultValue: $HOME/.gnupg
     required: false
 
+  - name: insecure_skip_verify
+    description: |
+      Skip SSL verification.
+    type: bool
+    defaultValue: false
+    required: false
+
   - name: key
     description: |
       Armored private GPG private key or the base64 encoded string of it.
     type: string
     required: true
+
+  - name: log_level
+    description: |
+      Plugin log level.
+    type: string
+    defaultValue: "info"
+    required: false
 
   - name: passphrase
     description: |
