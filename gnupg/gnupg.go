@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"golang.org/x/sys/execabs"
 
 	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
@@ -114,11 +115,12 @@ func (c *Client) SetHomedir(path string) error {
 // It runs the `gpgconf --list-dirs` command and parses the output
 // to populate the Dirs field of the Client struct.
 func (c *Client) GetDirs() error {
-	cmd, err := plugin_exec.Command(c.gpgconfBin, "--list-dirs")
+	absBin, err := execabs.LookPath(c.gpgconfBin)
 	if err != nil {
-		return fmt.Errorf("GetDirs: failed to create command: %w", err)
+		return fmt.Errorf("could not find executable %q: %w", c.gpgconfBin, err)
 	}
 
+	cmd := plugin_exec.Command(absBin, "--list-dirs")
 	cmd.Env = append(cmd.Env, c.Env...)
 
 	out, err := cmd.Output()
@@ -166,11 +168,12 @@ func (c *Client) GetDirs() error {
 func (c *Client) GetVersion() (*Version, error) {
 	version := &Version{}
 
-	cmd, err := plugin_exec.Command(c.gpgBin, "--version")
+	absBin, err := execabs.LookPath(c.gpgBin)
 	if err != nil {
-		return version, fmt.Errorf("GetVersion: failed to create command: %w", err)
+		return version, fmt.Errorf("could not find executable %q: %w", c.gpgconfBin, err)
 	}
 
+	cmd := plugin_exec.Command(absBin, "--version")
 	cmd.Env = append(cmd.Env, c.Env...)
 
 	out, err := cmd.CombinedOutput()

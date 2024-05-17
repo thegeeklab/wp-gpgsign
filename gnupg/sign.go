@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
+	"golang.org/x/sys/execabs"
 )
 
 // SignFile signs the file at the given path with the configured key.
@@ -39,11 +40,12 @@ func (c *Client) SignFile(armor, detach, clear bool, path string) error {
 
 	args = append(args, path)
 
-	cmd, err := plugin_exec.Command(c.gpgBin, args...)
+	absBin, err := execabs.LookPath(c.gpgBin)
 	if err != nil {
-		return fmt.Errorf("SignFile: failed to create command: %w", err)
+		return fmt.Errorf("could not find executable %q: %w", c.gpgconfBin, err)
 	}
 
+	cmd := plugin_exec.Command(absBin, args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	cmd.TraceWriter = c.traceWriter
