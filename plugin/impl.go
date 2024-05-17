@@ -13,8 +13,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/thegeeklab/wp-gpgsign/gnupg"
-	"github.com/thegeeklab/wp-plugin-go/v2/file"
-	"github.com/thegeeklab/wp-plugin-go/v2/slice"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v2/file"
+	plugin_slice "github.com/thegeeklab/wp-plugin-go/v2/slice"
 )
 
 //nolint:revive
@@ -38,7 +38,7 @@ func (p *Plugin) run(ctx context.Context) error {
 func (p *Plugin) FlagsFromContext() error {
 	var err error
 
-	rawFiles := slice.Unique(p.Context.StringSlice("files"))
+	rawFiles := plugin_slice.Unique(p.Context.StringSlice("files"))
 
 	p.Settings.files, err = expandGlobList(rawFiles)
 	if err != nil {
@@ -47,7 +47,7 @@ func (p *Plugin) FlagsFromContext() error {
 
 	p.Settings.setupOnly = (len(p.Settings.files) < 1)
 
-	rawExcludes := slice.Unique(p.Context.StringSlice("excludes"))
+	rawExcludes := plugin_slice.Unique(p.Context.StringSlice("excludes"))
 
 	p.Settings.excludes, err = expandGlobList(rawExcludes)
 	if err != nil {
@@ -164,7 +164,7 @@ func (p *Plugin) Execute() error {
 	}
 
 	// Sign all given files
-	for i, path := range slice.SetDifference(p.Settings.files, p.Settings.excludes, true) {
+	for i, path := range plugin_slice.SetDifference(p.Settings.files, p.Settings.excludes, true) {
 		if i == 0 {
 			log.Info().Msg("sign files")
 		}
@@ -182,7 +182,7 @@ func (p *Plugin) Execute() error {
 func expandGlobList(fileList []string) ([]string, error) {
 	result := make([]string, 0)
 
-	files, err := file.ExpandFileList(fileList)
+	files, err := plugin_file.ExpandFileList(fileList)
 	if err != nil {
 		return result, err
 	}

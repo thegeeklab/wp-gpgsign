@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"golang.org/x/sys/execabs"
+
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v2/exec"
 )
 
 var (
@@ -114,17 +114,12 @@ func (c *Client) SetHomedir(path string) error {
 // It runs the `gpgconf --list-dirs` command and parses the output
 // to populate the Dirs field of the Client struct.
 func (c *Client) GetDirs() error {
-	bin, err := execabs.LookPath(c.gpgconfBin)
+	cmd, err := plugin_exec.Command(c.gpgconfBin, "--list-dirs")
 	if err != nil {
-		return fmt.Errorf("failed to find gpg binary: %w", err)
+		return fmt.Errorf("GetDirs: failed to create command: %w", err)
 	}
 
-	cmd := types.Cmd{
-		Cmd: execabs.Command(bin, "--list-dirs"),
-	}
-	cmd.SetTrace(false)
-
-	cmd.Env = append(os.Environ(), c.Env...)
+	cmd.Env = append(cmd.Env, c.Env...)
 
 	out, err := cmd.Output()
 	if err != nil {
@@ -171,13 +166,9 @@ func (c *Client) GetDirs() error {
 func (c *Client) GetVersion() (*Version, error) {
 	version := &Version{}
 
-	bin, err := execabs.LookPath(c.gpgBin)
+	cmd, err := plugin_exec.Command(c.gpgBin, "--version")
 	if err != nil {
-		return version, fmt.Errorf("failed to find gpg binary: %w", err)
-	}
-
-	cmd := &types.Cmd{
-		Cmd: execabs.Command(bin, "--version"),
+		return version, fmt.Errorf("GetVersion: failed to create command: %w", err)
 	}
 
 	cmd.Env = append(os.Environ(), c.Env...)

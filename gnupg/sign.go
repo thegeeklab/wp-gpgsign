@@ -2,11 +2,11 @@ package gnupg
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"golang.org/x/sys/execabs"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v2/exec"
 )
 
 // SignFile signs the file at the given path with the configured key.
@@ -40,17 +40,13 @@ func (c *Client) SignFile(armor, detach, clear bool, path string) error {
 
 	args = append(args, path)
 
-	bin, err := execabs.LookPath(c.gpgBin)
+	cmd, err := plugin_exec.Command(c.gpgBin, args...)
 	if err != nil {
-		return fmt.Errorf("failed to find gpg binary: %w", err)
+		return fmt.Errorf("SignFile: failed to create command: %w", err)
 	}
 
-	cmd := types.Cmd{
-		Cmd:         execabs.Command(bin, args...),
-		Private:     true,
-		TraceWriter: c.traceWriter,
-	}
-
+	cmd.Stdout = io.Discard
+	cmd.TraceWriter = c.traceWriter
 	cmd.Env = append(os.Environ(), c.Env...)
 
 	if c.Key.Passphrase != "" {

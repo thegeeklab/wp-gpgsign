@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
-	"github.com/thegeeklab/wp-plugin-go/v2/types"
-	"golang.org/x/sys/execabs"
+
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v2/exec"
 )
 
 var (
@@ -62,17 +62,13 @@ func (c *Client) ImportKey() error {
 		"-",
 	}
 
-	bin, err := execabs.LookPath(c.gpgBin)
+	cmd, err := plugin_exec.Command(c.gpgBin, args...)
 	if err != nil {
-		return fmt.Errorf("failed to find gpg binary: %w", err)
+		return fmt.Errorf("ImportKey: failed to create command: %w", err)
 	}
 
-	cmd := types.Cmd{
-		Cmd:         execabs.Command(bin, args...),
-		TraceWriter: c.traceWriter,
-	}
-
-	cmd.Env = append(os.Environ(), c.Env...)
+	cmd.TraceWriter = c.traceWriter
+	cmd.Env = append(cmd.Env, c.Env...)
 	cmd.Stdin = strings.NewReader(c.Key.Content)
 
 	if err := cmd.Run(); err != nil {
@@ -102,16 +98,12 @@ func (c *Client) SetTrustLevel(level string) error {
 		c.Key.ID,
 	}
 
-	bin, err := execabs.LookPath(c.gpgBin)
+	cmd, err := plugin_exec.Command(c.gpgBin, args...)
 	if err != nil {
-		return fmt.Errorf("failed to find gpg binary: %w", err)
+		return fmt.Errorf("SetTrustLevel: failed to create command: %w", err)
 	}
 
-	cmd := types.Cmd{
-		Cmd:         execabs.Command(bin, args...),
-		TraceWriter: c.traceWriter,
-	}
-
+	cmd.TraceWriter = c.traceWriter
 	cmd.Env = append(os.Environ(), c.Env...)
 	cmd.Stdin = bytes.NewBuffer([]byte(fmt.Sprintf("trust\n%s\ny\nquit\n", level)))
 
