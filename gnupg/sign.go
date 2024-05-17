@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/thegeeklab/wp-plugin-go/trace"
+	"github.com/thegeeklab/wp-plugin-go/v3/trace"
 	"golang.org/x/sys/execabs"
 )
 

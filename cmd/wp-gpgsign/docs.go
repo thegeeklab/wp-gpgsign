@@ -11,9 +11,9 @@ import (
 	"text/template"
 
 	"github.com/thegeeklab/wp-gpgsign/plugin"
-	"github.com/thegeeklab/wp-plugin-go/docs"
-	wp "github.com/thegeeklab/wp-plugin-go/plugin"
-	wp_template "github.com/thegeeklab/wp-plugin-go/template"
+	"github.com/thegeeklab/wp-plugin-go/v3/docs"
+	wp "github.com/thegeeklab/wp-plugin-go/v3/plugin"
+	wp_template "github.com/thegeeklab/wp-plugin-go/v3/template"
 	"github.com/urfave/cli/v2"
 )
 

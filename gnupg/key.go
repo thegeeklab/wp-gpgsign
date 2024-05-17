@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
-	"github.com/thegeeklab/wp-plugin-go/trace"
+	"github.com/thegeeklab/wp-plugin-go/v3/trace"
 	"golang.org/x/sys/execabs"
 )
 

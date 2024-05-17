@@ -6,7 +6,7 @@
 package plugin
 
 import (
-	wp "github.com/thegeeklab/wp-plugin-go/plugin"
+	wp "github.com/thegeeklab/wp-plugin-go/v3/plugin"
 )
 
 // Plugin implements provide the plugin.
