@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/thegeeklab/wp-gpgsign/plugin"
-	plugin_docs "github.com/thegeeklab/wp-plugin-go/v2/docs"
-	plugin_tmpl "github.com/thegeeklab/wp-plugin-go/v2/template"
+	plugin_docs "github.com/thegeeklab/wp-plugin-go/v3/docs"
+	plugin_tmpl "github.com/thegeeklab/wp-plugin-go/v3/template"
 )
 
 func main() {

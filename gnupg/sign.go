@@ -2,11 +2,10 @@ package gnupg
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v2/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 // SignFile signs the file at the given path with the configured key.
@@ -45,9 +44,10 @@ func (c *Client) SignFile(armor, detach, clear bool, path string) error {
 		return fmt.Errorf("SignFile: failed to create command: %w", err)
 	}
 
-	cmd.Stdout = io.Discard
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
 	cmd.TraceWriter = c.traceWriter
-	cmd.Env = append(os.Environ(), c.Env...)
+	cmd.Env = append(cmd.Env, c.Env...)
 
 	if c.Key.Passphrase != "" {
 		cmd.Stdin = strings.NewReader(c.Key.Passphrase)

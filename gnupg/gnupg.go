@@ -11,7 +11,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v2/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 var (
@@ -171,7 +171,7 @@ func (c *Client) GetVersion() (*Version, error) {
 		return version, fmt.Errorf("GetVersion: failed to create command: %w", err)
 	}
 
-	cmd.Env = append(os.Environ(), c.Env...)
+	cmd.Env = append(cmd.Env, c.Env...)
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v2/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 var (
@@ -67,6 +67,8 @@ func (c *Client) ImportKey() error {
 		return fmt.Errorf("ImportKey: failed to create command: %w", err)
 	}
 
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
 	cmd.TraceWriter = c.traceWriter
 	cmd.Env = append(cmd.Env, c.Env...)
 	cmd.Stdin = strings.NewReader(c.Key.Content)
@@ -103,8 +105,10 @@ func (c *Client) SetTrustLevel(level string) error {
 		return fmt.Errorf("SetTrustLevel: failed to create command: %w", err)
 	}
 
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
 	cmd.TraceWriter = c.traceWriter
-	cmd.Env = append(os.Environ(), c.Env...)
+	cmd.Env = append(cmd.Env, c.Env...)
 	cmd.Stdin = bytes.NewBuffer([]byte(fmt.Sprintf("trust\n%s\ny\nquit\n", level)))
 
 	if err := cmd.Run(); err != nil {

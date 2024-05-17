@@ -8,7 +8,7 @@ package plugin
 import (
 	"fmt"
 
-	plugin_base "github.com/thegeeklab/wp-plugin-go/v2/plugin"
+	plugin_base "github.com/thegeeklab/wp-plugin-go/v3/plugin"
 	"github.com/urfave/cli/v2"
 )
 
