@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/thegeeklab/wp-plugin-go/trace"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 	"golang.org/x/sys/execabs"
 )
 
@@ -40,19 +40,20 @@ func (c *Client) SignFile(armor, detach, clear bool, path string) error {
 
 	args = append(args, path)
 
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
+	absBin, err := execabs.LookPath(c.gpgBin)
+	if err != nil {
+		return fmt.Errorf("could not find executable %q: %w", c.gpgconfBin, err)
+	}
 
-	cmd.Env = append(os.Environ(), c.Env...)
+	cmd := plugin_exec.Command(absBin, args...)
+	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
+	cmd.TraceWriter = c.traceWriter
+	cmd.Env = append(cmd.Env, c.Env...)
 
 	if c.Key.Passphrase != "" {
 		cmd.Stdin = strings.NewReader(c.Key.Passphrase)
 	}
-
-	trace.Cmd(cmd)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to sign file: %w", err)

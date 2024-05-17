@@ -10,8 +10,9 @@ import (
 	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
-	"github.com/thegeeklab/wp-plugin-go/trace"
 	"golang.org/x/sys/execabs"
+
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
 )
 
 var (
@@ -62,17 +63,17 @@ func (c *Client) ImportKey() error {
 		"-",
 	}
 
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
+	absBin, err := execabs.LookPath(c.gpgBin)
+	if err != nil {
+		return fmt.Errorf("could not find executable %q: %w", c.gpgconfBin, err)
+	}
 
-	cmd.Env = append(os.Environ(), c.Env...)
-	cmd.Stdout = os.Stdout
+	cmd := plugin_exec.Command(absBin, args...)
+	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
+	cmd.TraceWriter = c.traceWriter
+	cmd.Env = append(cmd.Env, c.Env...)
 	cmd.Stdin = strings.NewReader(c.Key.Content)
-
-	trace.Cmd(cmd)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to import gpg key: %w", err)
@@ -101,17 +102,17 @@ func (c *Client) SetTrustLevel(level string) error {
 		c.Key.ID,
 	}
 
-	cmd := execabs.Command(
-		gpgBin,
-		args...,
-	)
+	absBin, err := execabs.LookPath(c.gpgBin)
+	if err != nil {
+		return fmt.Errorf("could not find executable %q: %w", c.gpgconfBin, err)
+	}
 
-	cmd.Env = append(os.Environ(), c.Env...)
-	cmd.Stdout = os.Stdout
+	cmd := plugin_exec.Command(absBin, args...)
+	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
+	cmd.TraceWriter = c.traceWriter
+	cmd.Env = append(cmd.Env, c.Env...)
 	cmd.Stdin = bytes.NewBuffer([]byte(fmt.Sprintf("trust\n%s\ny\nquit\n", level)))
-
-	trace.Cmd(cmd)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to set key owner trust: %w", err)

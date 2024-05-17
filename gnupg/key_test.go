@@ -1,6 +1,10 @@
 package gnupg
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -107,6 +111,44 @@ DR26/jLw/MxN1+GAltDUUotwedOgyrnokXPFQrrGBgEfhpCSBpJxucMbSQuC8yZR
 	testKeyCreation      = "2024-03-11 21:46:35 +0100 CET"
 )
 
+var errBinaryNotFound = errors.New("failed to find gpg binary")
+
+func TestIsArmored(t *testing.T) {
+	tests := []struct {
+		name     string
+		key      string
+		expected bool
+	}{
+		{
+			name:     "valid armored key",
+			key:      testPrivateKey,
+			expected: true,
+		},
+		{
+			name:     "valid unarmored key",
+			key:      testPrivatekeyBase64,
+			expected: false,
+		},
+		{
+			name:     "empty key",
+			key:      "",
+			expected: false,
+		},
+		{
+			name:     "invalid key",
+			key:      "invalid key",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := IsArmored(tt.key)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
 func TestReadPrivateKey(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -143,6 +185,117 @@ func TestReadPrivateKey(t *testing.T) {
 			assert.Equal(t, gpgclient.Key.Fingerprint, testKeyFingerprint)
 			assert.Equal(t, gpgclient.Key.Identity, testKeyIdentity)
 			assert.Equal(t, gpgclient.Key.CreationTime, testKeyCreation.UTC())
+		})
+	}
+}
+
+func TestClient_ImportKey(t *testing.T) {
+	tests := []struct {
+		name    string
+		key     string
+		bin     string
+		env     []string
+		want    []string
+		wantErr error
+	}{
+		{
+			name: "success",
+			key:  testPrivateKey,
+			bin:  os.Args[0],
+			env:  []string{"GO_TEST_MODE=pass"},
+			want: []string{"gnupg.test --batch --import -"},
+		},
+		{
+			name:    "gpg binary not found",
+			bin:     "invalid",
+			key:     testPrivateKey,
+			wantErr: errBinaryNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			c := &Client{
+				gpgBin:      tt.bin,
+				traceWriter: buf,
+				Env:         tt.env,
+				Key: Key{
+					Content: tt.key,
+				},
+			}
+
+			err := c.ImportKey()
+
+			for _, l := range tt.want {
+				assert.Contains(t, buf.String(), l)
+			}
+
+			if tt.wantErr != nil {
+				assert.Error(t, err)
+
+				return
+			}
+
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestClient_SetTrustLevel(t *testing.T) {
+	tests := []struct {
+		name    string
+		level   string
+		bin     string
+		env     []string
+		want    []string
+		wantErr error
+	}{
+		{
+			name:  "valid trust level",
+			level: "full",
+			bin:   os.Args[0],
+			env:   []string{"GO_TEST_MODE=pass"},
+			want:  []string{fmt.Sprintf("gnupg.test --batch --no-tty --command-fd 0 --edit-key %s", testKeyID)},
+		},
+		{
+			name:    "invalid trust level",
+			level:   "invalid",
+			bin:     os.Args[0],
+			wantErr: ErrInvalidTrustLevel,
+		},
+		{
+			name:    "gpg binary not found",
+			bin:     "invalid",
+			wantErr: errBinaryNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			c := &Client{
+				gpgBin:      tt.bin,
+				traceWriter: buf,
+				Env:         tt.env,
+				Key: Key{
+					ID: testKeyID,
+				},
+			}
+
+			err := c.SetTrustLevel(tt.level)
+
+			for _, l := range tt.want {
+				assert.Contains(t, buf.String(), l)
+			}
+
+			if tt.wantErr != nil {
+				assert.Error(t, err)
+
+				return
+			}
+
+			assert.NoError(t, err)
 		})
 	}
 }
