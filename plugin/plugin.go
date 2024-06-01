@@ -111,6 +111,7 @@ func Flags(settings *Settings, category string) []cli.Flag {
 			Destination: &settings.Armor,
 			Value:       false,
 			EnvVars:     []string{"PLUGIN_ARMOR"},
+			Category:    category,
 		},
 		&cli.BoolFlag{
 			Name:        "detach-sign",
