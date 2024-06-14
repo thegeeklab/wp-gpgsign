@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.22@sha256:0f7691253e132744318ff4b02e0824fec9fa4f3b43b08afd1195599660d51521 as build
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.22@sha256:a1dc4081faf597ac3401677edc31d9fcf1eada1884791033b93d35fa7351791d as build
 
 ARG TARGETOS
 ARG TARGETARCH
