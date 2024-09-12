@@ -12,7 +12,7 @@ import (
 // SignFile signs the file at the given path with the configured key.
 // It supports detached, cleartext, and normal signing based on the
 // detach and clear arguments.
-func (c *Client) SignFile(armor, detach, clear bool, path string) error {
+func (c *Client) SignFile(armor, detachSign, clearSign bool, path string) error {
 	args := []string{
 		"-u",
 		fmt.Sprintf("%s!", c.Key.Fingerprint),
@@ -30,9 +30,9 @@ func (c *Client) SignFile(armor, detach, clear bool, path string) error {
 	}
 
 	switch {
-	case detach:
+	case detachSign:
 		args = append(args, "--detach-sign")
-	case clear:
+	case clearSign:
 		args = append(args, "--clear-sign")
 	default:
 		args = append(args, "--sign")
