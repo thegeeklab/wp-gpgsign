@@ -3,7 +3,7 @@ module github.com/thegeeklab/wp-gpgsign
 go 1.23.2
 
 require (
-	github.com/ProtonMail/gopenpgp/v2 v2.7.5
+	github.com/ProtonMail/gopenpgp/v2 v2.8.0
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
 	github.com/thegeeklab/wp-plugin-go/v3 v3.0.8
@@ -16,7 +16,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.3.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230717121422-5aa5874ade95 // indirect
+	github.com/ProtonMail/go-crypto v1.1.0 // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
