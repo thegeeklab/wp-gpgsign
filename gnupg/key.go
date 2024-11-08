@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ProtonMail/gopenpgp/v2/crypto"
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"golang.org/x/sys/execabs"
 
 	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
