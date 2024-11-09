@@ -9,6 +9,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/ProtonMail/go-crypto/openpgp/packet"
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"golang.org/x/sys/execabs"
 
@@ -43,12 +44,16 @@ func (c *Client) ReadPrivateKey() error {
 
 	c.Key.ID = primary.KeyIdString()
 	c.Key.CreationTime = primary.CreationTime.UTC()
-	c.Key.Identity = entity.PrimaryIdentity().Name
 	c.Key.Fingerprint = strings.ToUpper(hex.EncodeToString(primary.Fingerprint))
 
-	if c.Key.Identity == "" {
+	var config *packet.Config
+
+	_, identity := entity.PrimaryIdentity(config.Now(), &packet.Config{})
+	if identity == nil {
 		return ErrPrimaryIdentityNotFound
 	}
+
+	c.Key.Identity = identity.Name
 
 	return nil
 }
