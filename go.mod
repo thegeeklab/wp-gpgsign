@@ -4,7 +4,7 @@ go 1.23.3
 
 require (
 	github.com/ProtonMail/go-crypto v1.1.3
-	github.com/ProtonMail/gopenpgp/v3 v3.0.0
+	github.com/ProtonMail/gopenpgp/v3 v3.1.0
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.10.0
 	github.com/thegeeklab/wp-plugin-go/v3 v3.0.9
