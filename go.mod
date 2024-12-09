@@ -1,6 +1,6 @@
 module github.com/thegeeklab/wp-gpgsign
 
-go 1.23.3
+go 1.23.4
 
 require (
 	github.com/ProtonMail/go-crypto v1.1.3
