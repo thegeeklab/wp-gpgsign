@@ -13,8 +13,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/thegeeklab/wp-gpgsign/gnupg"
-	plugin_file "github.com/thegeeklab/wp-plugin-go/v3/file"
-	plugin_slice "github.com/thegeeklab/wp-plugin-go/v3/slice"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v4/file"
+	plugin_slice "github.com/thegeeklab/wp-plugin-go/v4/slice"
 )
 
 //nolint:revive
