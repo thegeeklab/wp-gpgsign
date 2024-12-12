@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v3/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
 	"golang.org/x/sys/execabs"
 )
 
