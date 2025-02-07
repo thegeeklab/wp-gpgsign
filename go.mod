@@ -7,7 +7,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v3 v3.1.2
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.10.0
-	github.com/thegeeklab/wp-plugin-go/v4 v4.0.4
+	github.com/thegeeklab/wp-plugin-go/v4 v4.0.5
 	github.com/urfave/cli/v2 v2.27.5
 	golang.org/x/sys v0.30.0
 )
