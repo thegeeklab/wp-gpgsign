@@ -13,7 +13,7 @@ import (
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"golang.org/x/sys/execabs"
 
-	plugin_exec "github.com/thegeeklab/wp-plugin-go/v4/exec"
+	plugin_exec "github.com/thegeeklab/wp-plugin-go/v5/exec"
 )
 
 var (
