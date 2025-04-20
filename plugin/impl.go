@@ -13,8 +13,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/thegeeklab/wp-gpgsign/gnupg"
-	plugin_file "github.com/thegeeklab/wp-plugin-go/v4/file"
-	plugin_slice "github.com/thegeeklab/wp-plugin-go/v4/slice"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v6/file"
+	plugin_slice "github.com/thegeeklab/wp-plugin-go/v6/slice"
 )
 
 //nolint:revive
@@ -38,7 +38,7 @@ func (p *Plugin) run(ctx context.Context) error {
 func (p *Plugin) FlagsFromContext() error {
 	var err error
 
-	rawFiles := plugin_slice.Unique(p.Context.StringSlice("files"))
+	rawFiles := plugin_slice.Unique(p.App.StringSlice("files"))
 
 	p.Settings.files, err = expandGlobList(rawFiles)
 	if err != nil {
@@ -47,14 +47,14 @@ func (p *Plugin) FlagsFromContext() error {
 
 	p.Settings.setupOnly = (len(p.Settings.files) < 1)
 
-	rawExcludes := plugin_slice.Unique(p.Context.StringSlice("excludes"))
+	rawExcludes := plugin_slice.Unique(p.App.StringSlice("excludes"))
 
 	p.Settings.excludes, err = expandGlobList(rawExcludes)
 	if err != nil {
 		return fmt.Errorf("failed to parse excludes: %w", err)
 	}
 
-	p.Settings.Key = p.Context.String("key")
+	p.Settings.Key = p.App.String("key")
 
 	if gnupg.IsArmored(p.Settings.Key) {
 		return nil
