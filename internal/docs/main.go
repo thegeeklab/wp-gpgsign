@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/thegeeklab/wp-gpgsign/plugin"
-	plugin_docs "github.com/thegeeklab/wp-plugin-go/v4/docs"
-	plugin_tmpl "github.com/thegeeklab/wp-plugin-go/v4/template"
+	plugin_docs "github.com/thegeeklab/wp-plugin-go/v6/docs"
+	plugin_tmpl "github.com/thegeeklab/wp-plugin-go/v6/template"
 )
 
 func main() {
