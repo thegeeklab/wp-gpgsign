@@ -17,7 +17,6 @@ import (
 	plugin_slice "github.com/thegeeklab/wp-plugin-go/v6/slice"
 )
 
-//nolint:revive
 func (p *Plugin) run(ctx context.Context) error {
 	if err := p.FlagsFromContext(); err != nil {
 		return fmt.Errorf("validation failed: %w", err)
