@@ -21,6 +21,7 @@ ARG TARGETOS
 ARG TARGETARCH
 
 RUN apk add --no-cache gnupg && \
+    apk upgrade --no-cache zlib && \
     rm -rf /var/cache/apk/* && \
     rm -rf /tmp/* && \
     rm -rf /root/.cache/
