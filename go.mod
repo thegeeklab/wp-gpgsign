@@ -8,7 +8,7 @@ require (
 	github.com/rs/zerolog v1.35.1
 	github.com/stretchr/testify v1.11.1
 	github.com/thegeeklab/wp-plugin-go/v6 v6.0.18
-	github.com/urfave/cli/v3 v3.9.0
+	github.com/urfave/cli/v3 v3.10.0
 	golang.org/x/sys v0.46.0
 )
 
