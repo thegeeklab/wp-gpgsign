@@ -7,7 +7,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v3 v3.4.1
 	github.com/rs/zerolog v1.35.1
 	github.com/stretchr/testify v1.12.1
-	github.com/thegeeklab/wp-plugin-go/v6 v6.1.2
+	github.com/thegeeklab/wp-plugin-go/v6 v6.2.0
 	github.com/urfave/cli/v3 v3.11.0
 	golang.org/x/sys v0.48.0
 )
@@ -28,6 +28,6 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cast v1.7.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/crypto v0.55.0 // indirect
-	golang.org/x/net v0.58.0 // indirect
+	golang.org/x/crypto v0.57.0 // indirect
+	golang.org/x/net v0.59.0 // indirect
 )
