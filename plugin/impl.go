@@ -13,8 +13,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/thegeeklab/wp-gpgsign/gnupg"
-	plugin_file "github.com/thegeeklab/wp-plugin-go/v6/file"
-	plugin_slice "github.com/thegeeklab/wp-plugin-go/v6/slice"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v7/file"
+	plugin_slice "github.com/thegeeklab/wp-plugin-go/v7/slice"
 )
 
 func (p *Plugin) run(ctx context.Context) error {

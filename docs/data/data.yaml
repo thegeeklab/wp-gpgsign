@@ -45,14 +45,6 @@ properties:
     description: |
       GPG home directory.
     type: string
-    defaultValue: $HOME/.gnupg
-    required: false
-
-  - name: insecure_skip_verify
-    description: |
-      Skip SSL verification.
-    type: bool
-    defaultValue: false
     required: false
 
   - name: key
