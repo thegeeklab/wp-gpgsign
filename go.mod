@@ -3,7 +3,7 @@ module github.com/thegeeklab/wp-gpgsign
 go 1.27.1
 
 require (
-	github.com/ProtonMail/go-crypto v1.5.0
+	github.com/ProtonMail/go-crypto v1.5.1
 	github.com/ProtonMail/gopenpgp/v3 v3.4.1
 	github.com/rs/zerolog v1.35.1
 	github.com/stretchr/testify v1.12.1
