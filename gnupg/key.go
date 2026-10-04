@@ -17,8 +17,10 @@ import (
 )
 
 var (
+	// ErrPrimaryIdentityNotFound is returned when the imported key has no primary identity.
 	ErrPrimaryIdentityNotFound = errors.New("no primary identity found")
-	ErrReadKeyFailed           = errors.New("failed to read private key")
+	// ErrReadKeyFailed is returned when the armored private key cannot be parsed.
+	ErrReadKeyFailed = errors.New("failed to read private key")
 )
 
 // IsArmored checks if the given key is armored by trying to parse it.
