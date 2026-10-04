@@ -15,13 +15,13 @@ import (
 
 //go:generate go run ../hack/docs-gen/main.go -output=../docs/data/data.yaml
 
-// Plugin implements provide the plugin.
+// Plugin provides the plugin implementation.
 type Plugin struct {
 	*plugin_base.Plugin
 	Settings *Settings
 }
 
-// Settings for the plugin.
+// Settings for the Plugin.
 type Settings struct {
 	Homedir     string
 	Key         string

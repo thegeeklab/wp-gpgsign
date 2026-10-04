@@ -16,9 +16,10 @@ import (
 )
 
 var (
-	ErrDirLookupFailed   = errors.New("failed to lookup gpg directories")
+	// ErrDirLookupFailed is returned when the gpgconf --list-dirs command fails.
+	ErrDirLookupFailed = errors.New("failed to lookup gpg directories")
+	// ErrInvalidTrustLevel is returned when a trust level outside the supported set is configured.
 	ErrInvalidTrustLevel = errors.New("invlaid key owner trust level")
-	ErrGetKeygripsFailed = errors.New("failed to get keygrips")
 )
 
 const (
